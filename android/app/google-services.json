@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "319582318965",
+    "project_id": "collective-rides",
+    "storage_bucket": "collective-rides.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:319582318965:android:67fc7b50ff05cbfa64e33c",
+        "android_client_info": {
+          "package_name": "com.collective.collective_rides"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFL7NHIzr8PPw65YBNI-rw3sxZ8B-cG8o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
