@@ -1,4 +1,4 @@
-import 'package:collective_rides/screens/login_screen.dart';
+import 'package:collective_rides/splashScreen/splash_screen.dart';
 import 'package:collective_rides/themeProvider/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
       theme: MyThemes.lightTheme,
       darkTheme: MyThemes.darkTheme,
       title: 'Collective Rides',
-      home: const LoginScreen(),
+      home: const SplashScreen(),
     );
   }
 }

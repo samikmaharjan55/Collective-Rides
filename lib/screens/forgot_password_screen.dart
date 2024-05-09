@@ -1,45 +1,35 @@
 import 'package:collective_rides/global/global.dart';
-import 'package:collective_rides/screens/forgot_password_screen.dart';
-import 'package:collective_rides/screens/main_screen.dart';
+import 'package:collective_rides/screens/login_screen.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final emailTextEditingController = TextEditingController();
-  final passwordTextEditingController = TextEditingController();
-
-  bool _passwordVisible = false;
 
   // Declare a GlobalKey
   final _formKey = GlobalKey<FormState>();
 
-  void _submit() async {
+  void _submit() {
     // validate all the form fields
     if (_formKey.currentState!.validate()) {
-      await firebaseAuth
-          .signInWithEmailAndPassword(
-        email: emailTextEditingController.text.trim(),
-        password: passwordTextEditingController.text.trim(),
-      )
-          .then((auth) async {
-        currentUser = auth.user;
-        await Fluttertoast.showToast(msg: "Successfully Logged In");
-        Navigator.push(
-            context, MaterialPageRoute(builder: (c) => const MainScreen()));
-      }).catchError((errorMessage) {
-        Fluttertoast.showToast(msg: "Error Occurred: \n $errorMessage");
+      firebaseAuth
+          .sendPasswordResetEmail(email: emailTextEditingController.text.trim())
+          .then((value) {
+        Fluttertoast.showToast(
+            msg:
+                "We have sent you an email to recover password, please check email.");
+      }).onError((error, stackTrace) {
+        Fluttertoast.showToast(msg: "Error Occurred: \n ${error.toString()}");
       });
-    } else {
-      Fluttertoast.showToast(msg: "Not all fields are valid");
     }
   }
 
@@ -66,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 20,
                 ),
                 Text(
-                  'Login',
+                  'Forgot Password',
                   style: TextStyle(
                     color: darkTheme ? Colors.amber.shade400 : Colors.blue,
                     fontSize: 25,
@@ -135,71 +125,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             const SizedBox(
                               height: 20,
                             ),
-                            TextFormField(
-                              obscureText: !_passwordVisible,
-                              inputFormatters: [
-                                LengthLimitingTextInputFormatter(50),
-                              ],
-                              decoration: InputDecoration(
-                                hintText: "Password",
-                                hintStyle: const TextStyle(
-                                  color: Colors.grey,
-                                ),
-                                filled: true,
-                                fillColor: darkTheme
-                                    ? Colors.black45
-                                    : Colors.grey.shade200,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(40),
-                                  borderSide: const BorderSide(
-                                    width: 0,
-                                    style: BorderStyle.none,
-                                  ),
-                                ),
-                                prefixIcon: Icon(
-                                  Icons.password,
-                                  color: darkTheme
-                                      ? Colors.amber.shade400
-                                      : Colors.grey,
-                                ),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _passwordVisible
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                    color: darkTheme
-                                        ? Colors.amber.shade400
-                                        : Colors.grey,
-                                  ),
-                                  onPressed: () {
-                                    // update the state i.e toggle the state of passwordVisible variable
-                                    setState(() {
-                                      _passwordVisible = !_passwordVisible;
-                                    });
-                                  },
-                                ),
-                              ),
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              validator: (text) {
-                                if (text == null || text.isEmpty) {
-                                  return "Password cannot be empty";
-                                }
-                                if (text.length < 6) {
-                                  return "Please enter a valid password";
-                                }
-                                if (text.length > 49) {
-                                  return "Password cannot be more than 50";
-                                }
-                                return null;
-                              },
-                              onChanged: (text) => setState(() {
-                                passwordTextEditingController.text = text;
-                              }),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: darkTheme
@@ -217,29 +142,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 _submit();
                               },
                               child: const Text(
-                                'Login',
+                                'Reset Password',
                                 style: TextStyle(
                                   fontSize: 20,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (c) =>
-                                            const ForgotPasswordScreen()));
-                              },
-                              child: Text(
-                                'Forgot Password?',
-                                style: TextStyle(
-                                  color: darkTheme
-                                      ? Colors.amber.shade400
-                                      : Colors.blue,
                                 ),
                               ),
                             ),
@@ -250,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 const Text(
-                                  "Don't have an account?",
+                                  "Already have an account?",
                                   style: TextStyle(
                                     color: Colors.grey,
                                     fontSize: 15,
@@ -260,9 +165,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                   width: 10,
                                 ),
                                 GestureDetector(
-                                  onTap: () {},
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (c) =>
+                                                const LoginScreen()));
+                                  },
                                   child: Text(
-                                    "Sign Up",
+                                    "Sign In",
                                     style: TextStyle(
                                       fontSize: 15,
                                       color: darkTheme
