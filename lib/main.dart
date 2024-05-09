@@ -1,4 +1,4 @@
-import 'package:collective_rides/screens/register_screen.dart';
+import 'package:collective_rides/screens/login_screen.dart';
 import 'package:collective_rides/themeProvider/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -22,8 +22,8 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: MyThemes.lightTheme,
       darkTheme: MyThemes.darkTheme,
-      title: 'Collective Rides Part 3 21:38',
-      home: const RegisterScreen(),
+      title: 'Collective Rides',
+      home: const LoginScreen(),
     );
   }
 }
