@@ -1,5 +1,5 @@
 import 'package:collective_rides/global/global.dart';
-import 'package:collective_rides/models/user_%20model.dart';
+import 'package:collective_rides/models/user_model.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class AssistantMethods {

@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
-
 import 'package:collective_rides/assistant/assistant_methods.dart';
 import 'package:collective_rides/global/global.dart';
 import 'package:collective_rides/screens/login_screen.dart';
