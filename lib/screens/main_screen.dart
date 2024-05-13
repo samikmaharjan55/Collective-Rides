@@ -24,6 +24,7 @@ class _MainScreenState extends State<MainScreen> {
     zoom: 14.4746,
   );
   final GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
+  GoogleMapController? newGoogleMapController;
 
   double searchLocationContainerHeight = 220;
   double waitingResponseFromDriverContainerHeight = 0;
@@ -36,10 +37,10 @@ class _MainScreenState extends State<MainScreen> {
   double bottomPaddingOfMap = 0;
 
   List<LatLng> pLineCoordinatesList = [];
-  Set<Polyline> polylineSet = {};
+  Set<Polyline> polylinesSet = {};
 
-  Set<Marker> markerSet = {};
-  Set<Circle> circleSet = {};
+  Set<Marker> markersSet = {};
+  Set<Circle> circlesSet = {};
 
   String userName = "";
   String userEmail = "";
@@ -47,11 +48,62 @@ class _MainScreenState extends State<MainScreen> {
   bool openNavigationDrawer = true;
   bool activeNearByDriverKeysLoaded = false;
 
+  BitmapDescriptor? activeNearbyIcon;
+
+  locateUserPosition() async {
+    LocationPermission permission = await Geolocator.requestPermission();
+    Position cPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    userCurrentPosition = cPosition;
+
+    LatLng latLngPosition =
+        LatLng(userCurrentPosition!.latitude, userCurrentPosition!.longitude);
+    CameraPosition cameraPosition = CameraPosition(
+      target: latLngPosition,
+      zoom: 15,
+    );
+
+    newGoogleMapController!
+        .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [],
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            GoogleMap(
+              mapType: MapType.normal,
+              myLocationButtonEnabled: true,
+              zoomGesturesEnabled: true,
+              zoomControlsEnabled: true,
+              initialCameraPosition: _kGooglePlex,
+              polylines: polylinesSet,
+              markers: markersSet,
+              circles: circlesSet,
+              onMapCreated: (GoogleMapController controller) {
+                _controllerGoogleMap.complete(controller);
+                newGoogleMapController = controller;
+                setState(() {});
+                locateUserPosition();
+              },
+              onCameraMove: (CameraPosition? position) {
+                if (pickLocation != position!.target) {
+                  setState(() {
+                    pickLocation = position.target;
+                  });
+                }
+              },
+              onCameraIdle: () {
+                // getAddressFromLatLng();
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

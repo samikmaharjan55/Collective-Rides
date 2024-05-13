@@ -1,6 +1,7 @@
 import 'package:collective_rides/global/global.dart';
 import 'package:collective_rides/screens/forgot_password_screen.dart';
 import 'package:collective_rides/screens/main_screen.dart';
+import 'package:collective_rides/screens/register_screen.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -260,7 +261,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                   width: 10,
                                 ),
                                 GestureDetector(
-                                  onTap: () {},
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const RegisterScreen()));
+                                  },
                                   child: Text(
                                     "Sign Up",
                                     style: TextStyle(
