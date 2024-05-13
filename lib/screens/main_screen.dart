@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:collective_rides/assistant/assistant_methods.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart' as loc;
 import 'package:flutter/material.dart';
@@ -65,6 +66,10 @@ class _MainScreenState extends State<MainScreen> {
 
     newGoogleMapController!
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    String humanReadableAddress =
+        await AssistantMethods.searchAddressForGeographicCoordinates(
+            userCurrentPosition!, context);
+    print("This is our address =" + humanReadableAddress);
   }
 
   @override
@@ -101,6 +106,19 @@ class _MainScreenState extends State<MainScreen> {
               onCameraIdle: () {
                 // getAddressFromLatLng();
               },
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  bottom: 35.0,
+                ),
+                child: Image.asset(
+                  "assets/images/pick.png",
+                  height: 45,
+                  width: 45,
+                ),
+              ),
             ),
           ],
         ),
