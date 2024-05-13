@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: MyThemes.lightTheme,
       darkTheme: MyThemes.darkTheme,
-      title: 'Collective Rides Part4 8:45',
+      title: 'Collective Rides',
       home: const SplashScreen(),
     );
   }
