@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:collective_rides/assistant/assistant_methods.dart';
+import 'package:collective_rides/global/map_key.dart';
+import 'package:geocoder2/geocoder2.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart' as loc;
 import 'package:flutter/material.dart';
@@ -52,7 +54,6 @@ class _MainScreenState extends State<MainScreen> {
   BitmapDescriptor? activeNearbyIcon;
 
   locateUserPosition() async {
-    LocationPermission permission = await Geolocator.requestPermission();
     Position cPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     userCurrentPosition = cPosition;
@@ -72,6 +73,36 @@ class _MainScreenState extends State<MainScreen> {
     print("This is our address =" + humanReadableAddress);
   }
 
+  getAddressFromLatLng() async {
+    try {
+      GeoData data = await Geocoder2.getDataFromCoordinates(
+        latitude: pickLocation!.latitude,
+        longitude: pickLocation!.longitude,
+        googleMapApiKey: mapKey,
+      );
+
+      setState(() {
+        _address = data.address;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  checkIfLocationPermissionAllowed() async {
+    _locationPermission = await Geolocator.requestPermission();
+    if (_locationPermission == LocationPermission.denied) {
+      _locationPermission = await Geolocator.requestPermission();
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    checkIfLocationPermissionAllowed();
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -83,7 +114,7 @@ class _MainScreenState extends State<MainScreen> {
           children: [
             GoogleMap(
               mapType: MapType.normal,
-              myLocationButtonEnabled: true,
+              myLocationEnabled: true,
               zoomGesturesEnabled: true,
               zoomControlsEnabled: true,
               initialCameraPosition: _kGooglePlex,
@@ -104,7 +135,7 @@ class _MainScreenState extends State<MainScreen> {
                 }
               },
               onCameraIdle: () {
-                // getAddressFromLatLng();
+                getAddressFromLatLng();
               },
             ),
             Align(
@@ -117,6 +148,25 @@ class _MainScreenState extends State<MainScreen> {
                   "assets/images/pick.png",
                   height: 45,
                   width: 45,
+                ),
+              ),
+            ),
+            Positioned(
+              top: 40,
+              right: 20,
+              left: 20,
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.black,
+                  ),
+                  color: Colors.white,
+                ),
+                padding: EdgeInsets.all(20),
+                child: Text(
+                  _address ?? "Set Your Pickup Location",
+                  overflow: TextOverflow.visible,
+                  softWrap: true,
                 ),
               ),
             ),
