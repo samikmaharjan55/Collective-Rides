@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'package:collective_rides/assistant/assistant_methods.dart';
+import 'package:collective_rides/global/global.dart';
 import 'package:collective_rides/global/map_key.dart';
+import 'package:collective_rides/infoHandler/app_info.dart';
+import 'package:collective_rides/models/directions.dart';
 import 'package:geocoder2/geocoder2.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart' as loc;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -71,6 +75,13 @@ class _MainScreenState extends State<MainScreen> {
         await AssistantMethods.searchAddressForGeographicCoordinates(
             userCurrentPosition!, context);
     print("This is our address =" + humanReadableAddress);
+
+    userName = userModelCurrentInfo!.name!;
+    userEmail = userModelCurrentInfo!.email!;
+
+    // initializeGeoFireListener();
+    //
+    // AssistantMethods.readTripsKeysForOnlineUser(context);
   }
 
   getAddressFromLatLng() async {
@@ -82,7 +93,13 @@ class _MainScreenState extends State<MainScreen> {
       );
 
       setState(() {
-        _address = data.address;
+        Directions userPickUpAddress = Directions();
+        userPickUpAddress.locationLatitude = pickLocation!.latitude;
+        userPickUpAddress.locationLongitude = pickLocation!.longitude;
+        userPickUpAddress.locationName = data.address;
+        Provider.of<AppInfo>(context, listen: false)
+            .updatePickUpLocationAddress(userPickUpAddress);
+        //_address = data.address;
       });
     } catch (e) {
       print(e);
@@ -162,9 +179,11 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                   color: Colors.white,
                 ),
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 child: Text(
-                  _address ?? "Set Your Pickup Location",
+                  Provider.of<AppInfo>(context).userPickUpLocation != null
+                      ? "${(Provider.of<AppInfo>(context).userPickUpLocation!.locationName!).substring(0, 24)}..."
+                      : "Not Getting Address",
                   overflow: TextOverflow.visible,
                   softWrap: true,
                 ),
