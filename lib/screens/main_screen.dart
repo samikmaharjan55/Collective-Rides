@@ -4,6 +4,7 @@ import 'package:collective_rides/global/global.dart';
 import 'package:collective_rides/global/map_key.dart';
 import 'package:collective_rides/infoHandler/app_info.dart';
 import 'package:collective_rides/models/directions.dart';
+import 'package:collective_rides/screens/search_places_screen.dart';
 import 'package:geocoder2/geocoder2.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart' as loc;
@@ -82,6 +83,13 @@ class _MainScreenState extends State<MainScreen> {
     // initializeGeoFireListener();
     //
     // AssistantMethods.readTripsKeysForOnlineUser(context);
+  }
+
+  Future<void> drawPolylineFromOriginToDestination(bool darkTheme) async {
+    var originPosition =
+        Provider.of<AppInfo>(context, listen: false).userPickUpLocation;
+    var destinationPosition =
+        Provider.of<AppInfo>(context, listen: false).userDropOffLocation;
   }
 
   getAddressFromLatLng() async {
@@ -257,7 +265,22 @@ class _MainScreenState extends State<MainScreen> {
                                 Padding(
                                   padding: const EdgeInsets.all(5.0),
                                   child: GestureDetector(
-                                    onTap: () {},
+                                    onTap: () async {
+                                      var responseFromSearchScreen =
+                                          await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (c) =>
+                                                      const SearchPlacesScreen()));
+                                      if (responseFromSearchScreen ==
+                                          "obtainedDropOff") {
+                                        setState(() {
+                                          openNavigationDrawer = false;
+                                        });
+                                      }
+                                      await drawPolylineFromOriginToDestination(
+                                          darkTheme);
+                                    },
                                     child: Row(
                                       children: [
                                         Icon(
@@ -287,7 +310,10 @@ class _MainScreenState extends State<MainScreen> {
                                               Provider.of<AppInfo>(context)
                                                           .userDropOffLocation !=
                                                       null
-                                                  ? "${(Provider.of<AppInfo>(context).userDropOffLocation!.locationName!).substring(0, 24)}..."
+                                                  ? Provider.of<AppInfo>(
+                                                          context)
+                                                      .userDropOffLocation!
+                                                      .locationName!
                                                   : "Where to?",
                                               style: const TextStyle(
                                                 color: Colors.grey,

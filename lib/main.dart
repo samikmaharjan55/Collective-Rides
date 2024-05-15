@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
         theme: MyThemes.lightTheme,
         darkTheme: MyThemes.darkTheme,
         title: 'Collective Rides',
-        home: const SearchPlacesScreen(),
+        home: const SplashScreen(),
       ),
     );
   }
