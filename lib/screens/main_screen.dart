@@ -5,6 +5,8 @@ import 'package:collective_rides/global/map_key.dart';
 import 'package:collective_rides/infoHandler/app_info.dart';
 import 'package:collective_rides/models/directions.dart';
 import 'package:collective_rides/screens/search_places_screen.dart';
+import 'package:collective_rides/widgets/progress_dialog.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geocoder2/geocoder2.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart' as loc;
@@ -90,6 +92,69 @@ class _MainScreenState extends State<MainScreen> {
         Provider.of<AppInfo>(context, listen: false).userPickUpLocation;
     var destinationPosition =
         Provider.of<AppInfo>(context, listen: false).userDropOffLocation;
+
+    var originLatLng = LatLng(
+        originPosition!.locationLatitude!, originPosition.locationLongitude!);
+    var destinationLatLng = LatLng(destinationPosition!.locationLatitude!,
+        destinationPosition.locationLongitude!);
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => ProgressDialog(
+              message: "Please wait...",
+            ));
+    var directionDetailsInfo =
+        await AssistantMethods.obtainOriginToDestinationDirectionDetails(
+            originLatLng, destinationLatLng);
+    setState(() {
+      tripDirectionDetailsInfo = directionDetailsInfo;
+    });
+    Navigator.pop(context);
+    PolylinePoints pPoints = PolylinePoints();
+    List<PointLatLng> decodePolylinePointsResultList =
+        pPoints.decodePolyline(directionDetailsInfo.e_points!);
+    pLineCoordinatesList.clear();
+    if (decodePolylinePointsResultList.isNotEmpty) {
+      decodePolylinePointsResultList.forEach((PointLatLng pointLatLng) {
+        pLineCoordinatesList
+            .add(LatLng(pointLatLng.latitude, pointLatLng.longitude));
+      });
+    }
+    polylinesSet.clear();
+    setState(() {
+      Polyline polyline = Polyline(
+        color: darkTheme ? Colors.amberAccent : Colors.blue,
+        polylineId: const PolylineId("PoluylineID"),
+        jointType: JointType.round,
+        points: pLineCoordinatesList,
+        startCap: Cap.roundCap,
+        endCap: Cap.roundCap,
+        geodesic: true,
+        width: 5,
+      );
+      polylinesSet.add(polyline);
+    });
+    LatLngBounds boundsLatLng;
+    if (originLatLng.latitude > destinationLatLng.latitude &&
+        originLatLng.longitude > destinationLatLng.longitude) {
+      boundsLatLng =
+          LatLngBounds(southwest: destinationLatLng, northeast: originLatLng);
+    } else if (originLatLng.longitude > destinationLatLng.longitude) {
+      boundsLatLng = LatLngBounds(
+        southwest: LatLng(originLatLng.latitude, destinationLatLng.longitude),
+        northeast: LatLng(destinationLatLng.latitude, originLatLng.longitude),
+      );
+    } else if (originLatLng.latitude > destinationLatLng.latitude) {
+      boundsLatLng = LatLngBounds(
+        southwest: LatLng(destinationLatLng.latitude, originLatLng.longitude),
+        northeast: LatLng(originLatLng.latitude, destinationLatLng.longitude),
+      );
+    } else {
+      boundsLatLng =
+          LatLngBounds(southwest: originLatLng, northeast: destinationLatLng);
+    }
+    newGoogleMapController!
+        .animateCamera(CameraUpdate.newLatLngBounds(boundsLatLng, 65));
   }
 
   getAddressFromLatLng() async {
