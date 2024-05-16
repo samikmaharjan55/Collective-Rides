@@ -1,5 +1,4 @@
 import 'package:collective_rides/infoHandler/app_info.dart';
-import 'package:collective_rides/screens/search_places_screen.dart';
 import 'package:collective_rides/splashScreen/splash_screen.dart';
 import 'package:collective_rides/themeProvider/theme_provider.dart';
 import 'package:flutter/material.dart';

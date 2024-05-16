@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'package:collective_rides/assistant/assistant_methods.dart';
 import 'package:collective_rides/global/global.dart';
-import 'package:collective_rides/global/map_key.dart';
 import 'package:collective_rides/infoHandler/app_info.dart';
-import 'package:collective_rides/models/directions.dart';
+import 'package:collective_rides/screens/precise_pickup_location.dart';
 import 'package:collective_rides/screens/search_places_screen.dart';
 import 'package:collective_rides/widgets/progress_dialog.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:geocoder2/geocoder2.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart' as loc;
 import 'package:flutter/material.dart';
@@ -199,27 +197,27 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  getAddressFromLatLng() async {
-    try {
-      GeoData data = await Geocoder2.getDataFromCoordinates(
-        latitude: pickLocation!.latitude,
-        longitude: pickLocation!.longitude,
-        googleMapApiKey: mapKey,
-      );
-
-      setState(() {
-        Directions userPickUpAddress = Directions();
-        userPickUpAddress.locationLatitude = pickLocation!.latitude;
-        userPickUpAddress.locationLongitude = pickLocation!.longitude;
-        userPickUpAddress.locationName = data.address;
-        Provider.of<AppInfo>(context, listen: false)
-            .updatePickUpLocationAddress(userPickUpAddress);
-        //_address = data.address;
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
+  // getAddressFromLatLng() async {
+  //   try {
+  //     GeoData data = await Geocoder2.getDataFromCoordinates(
+  //       latitude: pickLocation!.latitude,
+  //       longitude: pickLocation!.longitude,
+  //       googleMapApiKey: mapKey,
+  //     );
+  //
+  //     setState(() {
+  //       Directions userPickUpAddress = Directions();
+  //       userPickUpAddress.locationLatitude = pickLocation!.latitude;
+  //       userPickUpAddress.locationLongitude = pickLocation!.longitude;
+  //       userPickUpAddress.locationName = data.address;
+  //       Provider.of<AppInfo>(context, listen: false)
+  //           .updatePickUpLocationAddress(userPickUpAddress);
+  //       //_address = data.address;
+  //     });
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
 
   checkIfLocationPermissionAllowed() async {
     _locationPermission = await Geolocator.requestPermission();
@@ -258,33 +256,35 @@ class _MainScreenState extends State<MainScreen> {
               onMapCreated: (GoogleMapController controller) {
                 _controllerGoogleMap.complete(controller);
                 newGoogleMapController = controller;
-                setState(() {});
+                setState(() {
+                  bottomPaddingOfMap = 200;
+                });
                 locateUserPosition();
               },
-              onCameraMove: (CameraPosition? position) {
-                if (pickLocation != position!.target) {
-                  setState(() {
-                    pickLocation = position.target;
-                  });
-                }
-              },
-              onCameraIdle: () {
-                getAddressFromLatLng();
-              },
+              // onCameraMove: (CameraPosition? position) {
+              //   if (pickLocation != position!.target) {
+              //     setState(() {
+              //       pickLocation = position.target;
+              //     });
+              //   }
+              // },
+              // onCameraIdle: () {
+              //   getAddressFromLatLng();
+              // },
             ),
-            Align(
-              alignment: Alignment.center,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  bottom: 35.0,
-                ),
-                child: Image.asset(
-                  "assets/images/pick.png",
-                  height: 45,
-                  width: 45,
-                ),
-              ),
-            ),
+            // Align(
+            //   alignment: Alignment.center,
+            //   child: Padding(
+            //     padding: const EdgeInsets.only(
+            //       bottom:bottomPaddingOfMap,
+            //     ),
+            //     child: Image.asset(
+            //       "assets/images/pick.png",
+            //       height: 45,
+            //       width: 45,
+            //     ),
+            //   ),
+            // ),
 
             // UI for searching location
             Positioned(
@@ -435,6 +435,61 @@ class _MainScreenState extends State<MainScreen> {
                                 ),
                               ],
                             ),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (c) =>
+                                              const PrecisePickUpScreen()));
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: darkTheme
+                                      ? Colors.amber.shade400
+                                      : Colors.blue,
+                                  textStyle: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                child: Text(
+                                  "Change Pick Up",
+                                  style: TextStyle(
+                                    color:
+                                        darkTheme ? Colors.black : Colors.white,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              ElevatedButton(
+                                onPressed: () {},
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: darkTheme
+                                      ? Colors.amber.shade400
+                                      : Colors.blue,
+                                  textStyle: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                child: Text(
+                                  "Request a ride",
+                                  style: TextStyle(
+                                    color:
+                                        darkTheme ? Colors.black : Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
