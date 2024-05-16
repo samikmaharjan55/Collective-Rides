@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:collective_rides/assistant/assistant_methods.dart';
 import 'package:collective_rides/global/global.dart';
 import 'package:collective_rides/infoHandler/app_info.dart';
+import 'package:collective_rides/screens/drawer_screen.dart';
 import 'package:collective_rides/screens/precise_pickup_location.dart';
 import 'package:collective_rides/screens/search_places_screen.dart';
 import 'package:collective_rides/widgets/progress_dialog.dart';
@@ -121,7 +122,7 @@ class _MainScreenState extends State<MainScreen> {
     polylinesSet.clear();
     setState(() {
       Polyline polyline = Polyline(
-        color: darkTheme ? Colors.amberAccent : Colors.blue,
+        color: darkTheme ? Colors.blue : Colors.blue,
         polylineId: const PolylineId("PoluylineID"),
         jointType: JointType.round,
         points: pLineCoordinatesList,
@@ -242,6 +243,8 @@ class _MainScreenState extends State<MainScreen> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
+        key: _scaffoldState,
+        drawer: const DrawerScreen(),
         body: Stack(
           children: [
             GoogleMap(
@@ -286,6 +289,24 @@ class _MainScreenState extends State<MainScreen> {
             //   ),
             // ),
 
+            // Custom Hamburger Button For Drawer
+            Positioned(
+              top: 50,
+              left: 20,
+              child: GestureDetector(
+                onTap: () {
+                  _scaffoldState.currentState!.openDrawer();
+                },
+                child: CircleAvatar(
+                  backgroundColor:
+                      darkTheme ? Colors.amber.shade400 : Colors.white,
+                  child: Icon(
+                    Icons.menu,
+                    color: darkTheme ? Colors.black : Colors.lightBlue,
+                  ),
+                ),
+              ),
+            ),
             // UI for searching location
             Positioned(
               bottom: 0,
