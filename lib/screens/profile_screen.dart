@@ -185,6 +185,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool darkTheme =
+        MediaQuery.of(context).platformBrightness == Brightness.dark;
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -197,16 +199,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
             onPressed: () {
               Navigator.pop(context);
             },
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_back_ios,
-              color: Colors.white,
+              color: darkTheme ? Colors.white : Colors.black,
             ),
           ),
           elevation: 0.0,
-          title: const Text(
+          title: Text(
             "Profile",
             style: TextStyle(
-              color: Colors.white,
+              color: darkTheme ? Colors.white : Colors.black,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -235,7 +237,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "${userModelCurrentInfo!.name}",
+                      userModelCurrentInfo?.name ?? "",
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -259,7 +261,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "${userModelCurrentInfo!.phone}",
+                      userModelCurrentInfo?.phone ?? "",
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -283,7 +285,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "${userModelCurrentInfo!.address}",
+                      userModelCurrentInfo?.address ?? "",
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -304,7 +306,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   thickness: 1,
                 ),
                 Text(
-                  "${userModelCurrentInfo!.email}",
+                  userModelCurrentInfo?.email ?? "",
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
