@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'package:collective_rides/assistant/assistant_methods.dart';
+import 'package:collective_rides/assistant/geofire_assistant.dart';
 import 'package:collective_rides/global/global.dart';
 import 'package:collective_rides/infoHandler/app_info.dart';
+import 'package:collective_rides/models/active_nearby_available_riders.dart';
 import 'package:collective_rides/screens/drawer_screen.dart';
 import 'package:collective_rides/screens/precise_pickup_location.dart';
 import 'package:collective_rides/screens/search_places_screen.dart';
 import 'package:collective_rides/widgets/progress_dialog.dart';
+import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart' as loc;
@@ -55,7 +58,7 @@ class _MainScreenState extends State<MainScreen> {
   String userEmail = "";
 
   bool openNavigationDrawer = true;
-  bool activeNearByDriverKeysLoaded = false;
+  bool activeNearByRiderKeysLoaded = false;
 
   BitmapDescriptor? activeNearbyIcon;
 
@@ -81,9 +84,101 @@ class _MainScreenState extends State<MainScreen> {
     userName = userModelCurrentInfo!.name!;
     userEmail = userModelCurrentInfo!.email!;
 
-    // initializeGeoFireListener();
-    //
+    initializeGeoFireListener();
+
     // AssistantMethods.readTripsKeysForOnlineUser(context);
+  }
+
+  initializeGeoFireListener() {
+    Geofire.initialize("activeRiders");
+
+    Geofire.queryAtLocation(
+            userCurrentPosition!.latitude, userCurrentPosition!.longitude, 10)!
+        .listen((map) {
+      print(map);
+      if (map != null) {
+        var callBack = map["callBack"];
+
+        switch (callBack) {
+          // whenever any driver become active/online
+          case Geofire.onKeyEntered:
+            ActiveNearByAvailableRiders activeNearByAvailableRiders =
+                ActiveNearByAvailableRiders();
+            activeNearByAvailableRiders.locationLatitude = map["latitude"];
+            activeNearByAvailableRiders.locationLongitude = map["longitude"];
+            activeNearByAvailableRiders.riderId = map["key"];
+            GeoFireAssistant.activeNearByAvailableRidersList
+                .add(activeNearByAvailableRiders);
+            if (activeNearByRiderKeysLoaded == true) {
+              displayActiveRidersOnUsersMap();
+            }
+            break;
+
+          // whenever any rider become non-active/online
+          case Geofire.onKeyExited:
+            GeoFireAssistant.deleteOfflineRiderFromList(map['key']);
+            displayActiveRidersOnUsersMap();
+            break;
+
+          // whenever rider moves - update rider locationm
+          case Geofire.onKeyMoved:
+            ActiveNearByAvailableRiders activeNearByAvailableRiders =
+                ActiveNearByAvailableRiders();
+            activeNearByAvailableRiders.locationLatitude = map['latitude'];
+            activeNearByAvailableRiders.locationLongitude = map["longitude"];
+            activeNearByAvailableRiders.riderId = map["key"];
+            GeoFireAssistant.updateActiveNearByAvailableRiderLocation(
+                activeNearByAvailableRiders);
+            displayActiveRidersOnUsersMap();
+            break;
+
+          // display those online active riders on user's map
+          case Geofire.onGeoQueryReady:
+            activeNearByRiderKeysLoaded = true;
+            displayActiveRidersOnUsersMap();
+            break;
+        }
+      }
+      setState(() {});
+    });
+  }
+
+  displayActiveRidersOnUsersMap() {
+    setState(() {
+      markersSet.clear();
+      circlesSet.clear();
+
+      Set<Marker> ridersMarkerSet = Set<Marker>();
+
+      for (ActiveNearByAvailableRiders eachRider
+          in GeoFireAssistant.activeNearByAvailableRidersList) {
+        LatLng eachRiderActivePosition =
+            LatLng(eachRider.locationLatitude!, eachRider.locationLongitude!);
+
+        Marker marker = Marker(
+          markerId: MarkerId(eachRider.riderId!),
+          position: eachRiderActivePosition,
+          icon: activeNearbyIcon!,
+          rotation: 360,
+        );
+        ridersMarkerSet.add(marker);
+      }
+      setState(() {
+        markersSet = ridersMarkerSet;
+      });
+    });
+  }
+
+  createActiveNearByRiderIconMarker() {
+    if (activeNearbyIcon == null) {
+      ImageConfiguration imageConfiguration =
+          createLocalImageConfiguration(context, size: Size(2, 2));
+      BitmapDescriptor.fromAssetImage(
+              imageConfiguration, "assets/images/bike.png")
+          .then((value) {
+        activeNearbyIcon = value;
+      });
+    }
   }
 
   Future<void> drawPolylineFromOriginToDestination(bool darkTheme) async {
@@ -238,6 +333,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     bool darkTheme =
         MediaQuery.of(context).platformBrightness == Brightness.dark;
+    createActiveNearByRiderIconMarker();
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
