@@ -10,6 +10,7 @@ import 'package:collective_rides/screens/search_places_screen.dart';
 import 'package:collective_rides/widgets/progress_dialog.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart' as loc;
 import 'package:flutter/material.dart';
@@ -41,6 +42,7 @@ class _MainScreenState extends State<MainScreen> {
   double searchLocationContainerHeight = 220;
   double waitingResponseFromDriverContainerHeight = 0;
   double assignedDriverInfoContainerHeight = 0;
+  double suggestedRidesContainerHeight = 0;
 
   Position? userCurrentPosition;
   var geoLocator = Geolocator();
@@ -120,7 +122,7 @@ class _MainScreenState extends State<MainScreen> {
             displayActiveRidersOnUsersMap();
             break;
 
-          // whenever rider moves - update rider locationm
+          // whenever rider moves - update rider location
           case Geofire.onKeyMoved:
             ActiveNearByAvailableRiders activeNearByAvailableRiders =
                 ActiveNearByAvailableRiders();
@@ -172,7 +174,7 @@ class _MainScreenState extends State<MainScreen> {
   createActiveNearByRiderIconMarker() {
     if (activeNearbyIcon == null) {
       ImageConfiguration imageConfiguration =
-          createLocalImageConfiguration(context, size: Size(2, 2));
+          createLocalImageConfiguration(context, size: const Size(2, 2));
       BitmapDescriptor.fromAssetImage(
               imageConfiguration, "assets/images/bike.png")
           .then((value) {
@@ -293,6 +295,13 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  void showSuggestedRidesContainer() {
+    setState(() {
+      suggestedRidesContainerHeight = 400;
+      bottomPaddingOfMap = 400;
+    });
+  }
+
   // getAddressFromLatLng() async {
   //   try {
   //     GeoData data = await Geocoder2.getDataFromCoordinates(
@@ -360,30 +369,7 @@ class _MainScreenState extends State<MainScreen> {
                 });
                 locateUserPosition();
               },
-              // onCameraMove: (CameraPosition? position) {
-              //   if (pickLocation != position!.target) {
-              //     setState(() {
-              //       pickLocation = position.target;
-              //     });
-              //   }
-              // },
-              // onCameraIdle: () {
-              //   getAddressFromLatLng();
-              // },
             ),
-            // Align(
-            //   alignment: Alignment.center,
-            //   child: Padding(
-            //     padding: const EdgeInsets.only(
-            //       bottom:bottomPaddingOfMap,
-            //     ),
-            //     child: Image.asset(
-            //       "assets/images/pick.png",
-            //       height: 45,
-            //       width: 45,
-            //     ),
-            //   ),
-            // ),
 
             // Custom Hamburger Button For Drawer
             Positioned(
@@ -409,7 +395,7 @@ class _MainScreenState extends State<MainScreen> {
               left: 0,
               right: 0,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
+                padding: const EdgeInsets.fromLTRB(10, 50, 10, 10),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -588,7 +574,18 @@ class _MainScreenState extends State<MainScreen> {
                                 width: 10,
                               ),
                               ElevatedButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  if (Provider.of<AppInfo>(context,
+                                              listen: false)
+                                          .userDropOffLocation !=
+                                      null) {
+                                    showSuggestedRidesContainer();
+                                  } else {
+                                    Fluttertoast.showToast(
+                                        msg:
+                                            "Please select destination location");
+                                  }
+                                },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: darkTheme
                                       ? Colors.amber.shade400
@@ -599,7 +596,7 @@ class _MainScreenState extends State<MainScreen> {
                                   ),
                                 ),
                                 child: Text(
-                                  "Request a ride",
+                                  "Show Fare",
                                   style: TextStyle(
                                     color:
                                         darkTheme ? Colors.black : Colors.white,
@@ -615,27 +612,146 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               ),
             ),
-            // Positioned(
-            //   top: 40,
-            //   right: 20,
-            //   left: 20,
-            //   child: Container(
-            //     decoration: BoxDecoration(
-            //       border: Border.all(
-            //         color: Colors.black,
-            //       ),
-            //       color: Colors.white,
-            //     ),
-            //     padding: const EdgeInsets.all(20),
-            //     child: Text(
-            //       Provider.of<AppInfo>(context).userPickUpLocation != null
-            //           ? "${(Provider.of<AppInfo>(context).userPickUpLocation!.locationName!).substring(0, 24)}..."
-            //           : "Not Getting Address",
-            //       overflow: TextOverflow.visible,
-            //       softWrap: true,
-            //     ),
-            //   ),
-            // ),
+
+            // UI for suggested rides
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                height: suggestedRidesContainerHeight,
+                decoration: BoxDecoration(
+                  color: darkTheme ? Colors.black : Colors.white,
+                  borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(20),
+                    topLeft: Radius.circular(20),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: darkTheme
+                                  ? Colors.amber.shade400
+                                  : Colors.blue,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                            child: const Icon(
+                              Icons.star,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 15,
+                          ),
+                          Text(
+                            Provider.of<AppInfo>(context).userPickUpLocation !=
+                                    null
+                                ? "${(Provider.of<AppInfo>(context).userPickUpLocation!.locationName!).substring(0, 24)}..."
+                                : "Not Getting Address",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(2),
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(2),
+                            ),
+                            child: const Icon(
+                              Icons.star,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(
+                            width: 15,
+                          ),
+                          Text(
+                            Provider.of<AppInfo>(context).userDropOffLocation !=
+                                    null
+                                ? Provider.of<AppInfo>(context)
+                                    .userDropOffLocation!
+                                    .locationName!
+                                : "Where to?",
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      const Text(
+                        "SUGGESTED RIDES",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(25),
+                              child: Column(
+                                children: [
+                                  Image.asset(
+                                    "assets/images/bike.png",
+                                    scale: 15,
+                                  ),
+                                  const SizedBox(
+                                    height: 8,
+                                  ),
+                                  const Text(
+                                    "Bike",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 2,
+                                  ),
+                                  const Text(
+                                    "Fare Amount",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
