@@ -7,5 +7,10 @@ User? currentUser;
 
 UserModel? userModelCurrentInfo;
 DirectionDetailsInfo? tripDirectionDetailsInfo;
-
 String userDropOffAddress = "";
+String riderVehicleDetails = "";
+String riderName = "";
+String riderPhone = "";
+
+double countRatingStars = 0.0;
+String titleStarsRating = "";
