@@ -6,6 +6,8 @@ final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 User? currentUser;
 
 UserModel? userModelCurrentInfo;
+
+List ridersList = [];
 DirectionDetailsInfo? tripDirectionDetailsInfo;
 String userDropOffAddress = "";
 String riderVehicleDetails = "";

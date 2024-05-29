@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
 import 'package:collective_rides/assistant/assistant_methods.dart';
 import 'package:collective_rides/assistant/geofire_assistant.dart';
 import 'package:collective_rides/global/global.dart';
@@ -8,6 +7,7 @@ import 'package:collective_rides/models/active_nearby_available_riders.dart';
 import 'package:collective_rides/screens/drawer_screen.dart';
 import 'package:collective_rides/screens/precise_pickup_location.dart';
 import 'package:collective_rides/screens/search_places_screen.dart';
+import 'package:collective_rides/splashScreen/splash_screen.dart';
 import 'package:collective_rides/widgets/progress_dialog.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -46,6 +46,7 @@ class _MainScreenState extends State<MainScreen> {
   double waitingResponseFromDriverContainerHeight = 0;
   double assignedDriverInfoContainerHeight = 0;
   double suggestedRidesContainerHeight = 0;
+  double searchingForRiderContainerHeight = 0;
 
   Position? userCurrentPosition;
   var geoLocator = Geolocator();
@@ -77,6 +78,8 @@ class _MainScreenState extends State<MainScreen> {
   List<ActiveNearByAvailableRiders> onlineNearByAvailableRidersList = [];
 
   String userRideRequestStatus = "";
+
+  bool requestPositionInfo = true;
 
   locateUserPosition() async {
     Position cPosition = await Geolocator.getCurrentPosition(
@@ -309,6 +312,12 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  void showSearchingForRidersContainer() {
+    setState(() {
+      searchingForRiderContainerHeight = 200;
+    });
+  }
+
   void showSuggestedRidesContainer() {
     setState(() {
       suggestedRidesContainerHeight = 400;
@@ -447,6 +456,131 @@ class _MainScreenState extends State<MainScreen> {
     onlineNearByAvailableRidersList =
         GeoFireAssistant.activeNearByAvailableRidersList;
     searchNearestOnlineRiders(selectedVehicleType);
+  }
+
+  searchNearestOnlineRiders(selectedVehicleType) async {
+    if (onlineNearByAvailableRidersList.length == 0) {
+      // cancel/delete the rideRequest Information
+      referenceRideRequest!.remove();
+      setState(() {
+        polylinesSet.clear();
+        markersSet.clear();
+        circlesSet.clear();
+        pLineCoordinatesList.clear();
+      });
+      Fluttertoast.showToast(msg: "No online nearest Rider Available");
+      Fluttertoast.showToast(msg: "Search Again. \n Restart App");
+
+      Future.delayed(Duration(milliseconds: 4000), () {
+        referenceRideRequest!.remove();
+        Navigator.push(
+            context, MaterialPageRoute(builder: (c) => SplashScreen()));
+      });
+      return;
+    }
+    await retrieveOnlineDriversInformation(onlineNearByAvailableRidersList);
+    print("Rider List:" + ridersList.toString());
+    for (int i = 0; i < ridersList.length; i++) {
+      if (ridersList[i]["vehicle_details"]["type"] == selectedVehicleType) {
+        AssistantMethods.sendNotificationToDriverNow(
+            ridersList[i]["token"], referenceRideRequest!.key!, context);
+      }
+    }
+    Fluttertoast.showToast(msg: "Notification sent Successfully");
+
+    showSearchingForRidersContainer();
+
+    await FirebaseDatabase.instance
+        .ref()
+        .child("All Ride Requests")
+        .child(referenceRideRequest!.key!)
+        .child("riderId")
+        .onValue
+        .listen((eventRideRequestSnapchot) {
+      print("EventSnapshot:${eventRideRequestSnapchot.snapshot.value}");
+      if (eventRideRequestSnapchot.snapshot.value != null) {
+        if (eventRideRequestSnapchot.snapshot.value != "waiting") {
+          showUIForAssignedDriverInfo();
+        }
+      }
+    });
+  }
+
+  updateArrivalTimeToUserPickUpLocation(riderCurrentPositionLatLng) async {
+    if (requestPositionInfo == true) {
+      requestPositionInfo = false;
+      LatLng userPickUpPosition =
+          LatLng(userCurrentPosition!.latitude, userCurrentPosition!.longitude);
+
+      var directionDetailsInfo =
+          await AssistantMethods.obtainOriginToDestinationDirectionDetails(
+        riderCurrentPositionLatLng,
+        userPickUpPosition,
+      );
+
+      if (directionDetailsInfo == null) {
+        return;
+      }
+      setState(() {
+        riderRideStatus =
+            "Rider is coming" + directionDetailsInfo.distance_text.toString();
+      });
+      requestPositionInfo = true;
+    }
+  }
+
+  updateReachingTimeToUserDropOffLocation(riderCurrentPositionLatLng) async {
+    if (requestPositionInfo == true) {
+      requestPositionInfo = false;
+
+      var dropOffLocation =
+          Provider.of<AppInfo>(context, listen: false).userDropOffLocation;
+
+      LatLng userDestinationPosition = LatLng(
+        dropOffLocation!.locationLatitude!,
+        dropOffLocation.locationLongitude!,
+      );
+      var directionDetailsInfo =
+          await AssistantMethods.obtainOriginToDestinationDirectionDetails(
+        riderCurrentPositionLatLng,
+        userDestinationPosition,
+      );
+      if (directionDetailsInfo == null) {
+        return;
+      }
+      setState(() {
+        riderRideStatus = "Going towards Destination:" +
+            directionDetailsInfo.duration_text.toString();
+      });
+      requestPositionInfo = true;
+    }
+  }
+
+  showUIForAssignedRiderInfo() {
+    setState(() {
+      waitingResponseFromDriverContainerHeight = 0;
+      searchLocationContainerHeight = 0;
+      assignedDriverInfoContainerHeight = 200;
+      suggestedRidesContainerHeight = 0;
+      bottomPaddingOfMap = 200;
+    });
+  }
+
+  retrieveOnlineDriversInformation(List onlineNearestRidersList) async {
+    ridersList.clear();
+    DatabaseReference ref = FirebaseDatabase.instance.ref().child("riders");
+
+    for (int i = 0; i < onlineNearestRidersList.length; i++) {
+      await ref
+          .child(onlineNearestRidersList[i].riderId.toString())
+          .once()
+          .then((dataSnapshot) {
+        var riderKeyInfo = dataSnapshot.snapshot.value;
+
+        ridersList.add(riderKeyInfo);
+        print("rider key information = " + ridersList.toString());
+      });
+    }
   }
 
   @override
