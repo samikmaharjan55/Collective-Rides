@@ -8,8 +8,8 @@ import 'package:collective_rides/screens/drawer_screen.dart';
 import 'package:collective_rides/screens/precise_pickup_location.dart';
 import 'package:collective_rides/screens/search_places_screen.dart';
 import 'package:collective_rides/splashScreen/splash_screen.dart';
+import 'package:collective_rides/widgets/pay_fare_amount_dialog.dart';
 import 'package:collective_rides/widgets/progress_dialog.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -471,10 +471,10 @@ class _MainScreenState extends State<MainScreen> {
       Fluttertoast.showToast(msg: "No online nearest Rider Available");
       Fluttertoast.showToast(msg: "Search Again. \n Restart App");
 
-      Future.delayed(Duration(milliseconds: 4000), () {
+      Future.delayed(const Duration(milliseconds: 4000), () {
         referenceRideRequest!.remove();
         Navigator.push(
-            context, MaterialPageRoute(builder: (c) => SplashScreen()));
+            context, MaterialPageRoute(builder: (c) => const SplashScreen()));
       });
       return;
     }
@@ -482,7 +482,7 @@ class _MainScreenState extends State<MainScreen> {
     print("Rider List:" + ridersList.toString());
     for (int i = 0; i < ridersList.length; i++) {
       if (ridersList[i]["vehicle_details"]["type"] == selectedVehicleType) {
-        AssistantMethods.sendNotificationToDriverNow(
+        AssistantMethods.sendNotificationToRiderNow(
             ridersList[i]["token"], referenceRideRequest!.key!, context);
       }
     }
@@ -500,7 +500,7 @@ class _MainScreenState extends State<MainScreen> {
       print("EventSnapshot:${eventRideRequestSnapchot.snapshot.value}");
       if (eventRideRequestSnapchot.snapshot.value != null) {
         if (eventRideRequestSnapchot.snapshot.value != "waiting") {
-          showUIForAssignedDriverInfo();
+          showUIForAssignedRiderInfo();
         }
       }
     });
@@ -1123,6 +1123,94 @@ class _MainScreenState extends State<MainScreen> {
                           ),
                         ),
                       )),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // Requesting a Ride
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                height: searchingForRiderContainerHeight,
+                decoration: BoxDecoration(
+                  color: darkTheme ? Colors.black : Colors.white,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(15),
+                    topRight: Radius.circular(15),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 18,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      LinearProgressIndicator(
+                        color: darkTheme ? Colors.amber.shade400 : Colors.blue,
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      const Center(
+                        child: Text(
+                          "Searching for a rider...",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          referenceRideRequest!.remove();
+                          setState(() {
+                            searchingForRiderContainerHeight = 0;
+                            suggestedRidesContainerHeight = 0;
+                          });
+                        },
+                        child: Container(
+                          height: 50,
+                          width: 50,
+                          decoration: BoxDecoration(
+                            color: darkTheme ? Colors.black : Colors.white,
+                            borderRadius: BorderRadius.circular(25),
+                            border: Border.all(
+                              width: 1,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.close,
+                            size: 25,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Container(
+                        width: double.infinity,
+                        child: const Text(
+                          "Cancel",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),

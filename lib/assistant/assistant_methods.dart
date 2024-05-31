@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:js_interop';
-
 import 'package:collective_rides/assistant/request_assistant.dart';
 import 'package:collective_rides/global/global.dart';
 import 'package:collective_rides/global/map_key.dart';
