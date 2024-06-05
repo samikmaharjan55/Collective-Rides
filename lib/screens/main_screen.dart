@@ -380,15 +380,21 @@ class _MainScreenState extends State<MainScreen> {
 
       if ((eventSnap.snapshot.value as Map)["riderPhone"] != null) {
         setState(() {
-          riderVehicleDetails =
+          riderPhone =
               (eventSnap.snapshot.value as Map)["riderPhone"].toString();
         });
       }
 
       if ((eventSnap.snapshot.value as Map)["riderName"] != null) {
         setState(() {
-          riderVehicleDetails =
-              (eventSnap.snapshot.value as Map)["riderName"].toString();
+          riderName = (eventSnap.snapshot.value as Map)["riderName"].toString();
+        });
+      }
+
+      if ((eventSnap.snapshot.value as Map)["ratings"] != null) {
+        setState(() {
+          riderRatings =
+              (eventSnap.snapshot.value as Map)["ratings"].toString();
         });
       }
 
@@ -1210,6 +1216,129 @@ class _MainScreenState extends State<MainScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // UI for displaying assigned rider information
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: assignedDriverInfoContainerHeight,
+                decoration: BoxDecoration(
+                  color: darkTheme ? Colors.black : Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    children: [
+                      Text(
+                        riderRideStatus,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Divider(
+                        thickness: 1,
+                        color: darkTheme ? Colors.grey : Colors.grey[300],
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: darkTheme
+                                      ? Colors.amber.shade400
+                                      : Colors.lightBlue,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Icon(
+                                  Icons.person,
+                                  color:
+                                      darkTheme ? Colors.black : Colors.white,
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    riderName,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.star,
+                                        color: Colors.orange,
+                                      ),
+                                      const SizedBox(
+                                        width: 5,
+                                      ),
+                                      Text(
+                                        "4.5",
+                                        style: const TextStyle(
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Image.asset(
+                                "assets/images/bike.png",
+                                scale: 3,
+                              ),
+                              Text(
+                                riderVehicleDetails,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Divider(
+                        thickness: 1,
+                        color: darkTheme ? Colors.grey : Colors.grey[300],
+                      ),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor:
+                              darkTheme ? Colors.amber.shade400 : Colors.blue,
+                        ),
+                        onPressed: () {},
+                        label: Text("Call Rider"),
+                        icon: Icon(Icons.phone),
                       ),
                     ],
                   ),
