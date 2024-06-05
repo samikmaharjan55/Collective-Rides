@@ -19,6 +19,15 @@ import 'package:location/location.dart' as loc;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+
+Future<void> _makePhoneCall(String url) async {
+  if (await canLaunchUrlString(url)) {
+    await launchUrlString(url);
+  } else {
+    throw "Could not launch $url";
+  }
+}
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -1287,16 +1296,16 @@ class _MainScreenState extends State<MainScreen> {
                                   ),
                                   Row(
                                     children: [
-                                      const Icon(
+                                      Icon(
                                         Icons.star,
                                         color: Colors.orange,
                                       ),
-                                      const SizedBox(
+                                      SizedBox(
                                         width: 5,
                                       ),
                                       Text(
-                                        "4.5",
-                                        style: const TextStyle(
+                                        riderRatings,
+                                        style: TextStyle(
                                           color: Colors.grey,
                                         ),
                                       ),
@@ -1324,7 +1333,7 @@ class _MainScreenState extends State<MainScreen> {
                           ),
                         ],
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 5,
                       ),
                       Divider(
@@ -1336,9 +1345,11 @@ class _MainScreenState extends State<MainScreen> {
                           foregroundColor:
                               darkTheme ? Colors.amber.shade400 : Colors.blue,
                         ),
-                        onPressed: () {},
-                        label: Text("Call Rider"),
-                        icon: Icon(Icons.phone),
+                        onPressed: () {
+                          _makePhoneCall("tel: ${riderPhone}");
+                        },
+                        label: const Text("Call Rider"),
+                        icon: const Icon(Icons.phone),
                       ),
                     ],
                   ),

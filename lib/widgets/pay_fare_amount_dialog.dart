@@ -27,6 +27,7 @@ class _PayFareAmountDialogState extends State<PayFareAmountDialog> {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(
               height: 20,
