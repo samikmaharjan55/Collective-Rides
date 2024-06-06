@@ -6,6 +6,7 @@ import 'package:collective_rides/infoHandler/app_info.dart';
 import 'package:collective_rides/models/active_nearby_available_riders.dart';
 import 'package:collective_rides/screens/drawer_screen.dart';
 import 'package:collective_rides/screens/precise_pickup_location.dart';
+import 'package:collective_rides/screens/rate_rider_screen.dart';
 import 'package:collective_rides/screens/search_places_screen.dart';
 import 'package:collective_rides/splashScreen/splash_screen.dart';
 import 'package:collective_rides/widgets/pay_fare_amount_dialog.dart';
@@ -114,7 +115,7 @@ class _MainScreenState extends State<MainScreen> {
 
     initializeGeoFireListener();
 
-    // AssistantMethods.readTripsKeysForOnlineUser(context);
+    AssistantMethods.readTripsKeysForOnlineUser(context);
   }
 
   initializeGeoFireListener() {
@@ -457,8 +458,13 @@ class _MainScreenState extends State<MainScreen> {
               if ((eventSnap.snapshot.value as Map)["riderId"] != null) {
                 String assignedRiderId =
                     (eventSnap.snapshot.value as Map)["riderId"].toString();
-                // Navigator.push(context,
-                //     MaterialPageRoute(builder: (c) => RateDriverScreen()));
+                (eventSnap.snapshot.value as Map)["riderId"].toString();
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (c) => RateRiderScreen(
+                              assignedRiderId: assignedRiderId,
+                            )));
 
                 referenceRideRequest!.onDisconnect();
                 tripRidesRequestInfoStreamSubscription!.cancel();
@@ -1214,9 +1220,9 @@ class _MainScreenState extends State<MainScreen> {
                       const SizedBox(
                         height: 15,
                       ),
-                      Container(
+                      const SizedBox(
                         width: double.infinity,
-                        child: const Text(
+                        child: Text(
                           "Cancel",
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -1296,16 +1302,16 @@ class _MainScreenState extends State<MainScreen> {
                                   ),
                                   Row(
                                     children: [
-                                      Icon(
+                                      const Icon(
                                         Icons.star,
                                         color: Colors.orange,
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 5,
                                       ),
                                       Text(
                                         riderRatings,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: Colors.grey,
                                         ),
                                       ),
