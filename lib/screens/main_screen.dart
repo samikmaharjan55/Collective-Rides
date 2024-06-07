@@ -131,6 +131,7 @@ class _MainScreenState extends State<MainScreen> {
         switch (callBack) {
           // whenever any driver become active/online
           case Geofire.onKeyEntered:
+            GeoFireAssistant.activeNearByAvailableRidersList.clear();
             ActiveNearByAvailableRiders activeNearByAvailableRiders =
                 ActiveNearByAvailableRiders();
             activeNearByAvailableRiders.locationLatitude = map["latitude"];
@@ -637,6 +638,11 @@ class _MainScreenState extends State<MainScreen> {
               onMapCreated: (GoogleMapController controller) {
                 _controllerGoogleMap.complete(controller);
                 newGoogleMapController = controller;
+                if (darkTheme == true) {
+                  setState(() {
+                    //blackThemeGoogleMap(newGoogleMapController);
+                  });
+                }
                 setState(() {
                   bottomPaddingOfMap = 200;
                 });

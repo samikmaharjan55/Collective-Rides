@@ -47,7 +47,7 @@ class _TripsHistoryScreenState extends State<TripsHistoryScreen> {
           shrinkWrap: true,
           itemBuilder: (context, i) {
             return Card(
-              color: Colors.grey[100],
+              color: darkTheme?Colors.black:Colors.grey[100],
               shadowColor: Colors.transparent,
               child: HistoryDesignUiWidget(
                 tripsHistoryModel: Provider.of<AppInfo>(context, listen: false)
