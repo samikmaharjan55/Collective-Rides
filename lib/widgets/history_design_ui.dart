@@ -23,12 +23,14 @@ class _HistoryDesignUiWidgetState extends State<HistoryDesignUiWidget> {
 
   @override
   Widget build(BuildContext context) {
+    bool darkTheme =
+        MediaQuery.of(context).platformBrightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           formatDateAndTime(widget.tripsHistoryModel!.time!),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.bold,
           ),
@@ -38,7 +40,7 @@ class _HistoryDesignUiWidgetState extends State<HistoryDesignUiWidget> {
         ),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: darkTheme ? Colors.black : Colors.white,
             borderRadius: BorderRadius.circular(20),
           ),
           padding: const EdgeInsets.all(15),
