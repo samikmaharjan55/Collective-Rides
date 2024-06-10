@@ -30,7 +30,7 @@ class _HistoryDesignUiWidgetState extends State<HistoryDesignUiWidget> {
       children: [
         Text(
           formatDateAndTime(widget.tripsHistoryModel!.time!),
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.bold,
           ),
@@ -138,17 +138,17 @@ class _HistoryDesignUiWidgetState extends State<HistoryDesignUiWidget> {
                   ),
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               Divider(
                 thickness: 3,
                 color: Colors.grey[200],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
-              Row(
+              const Row(
                 children: [
                   Text(
                     "TRIP",
@@ -158,7 +158,7 @@ class _HistoryDesignUiWidgetState extends State<HistoryDesignUiWidget> {
                   ),
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               Row(
@@ -167,22 +167,22 @@ class _HistoryDesignUiWidgetState extends State<HistoryDesignUiWidget> {
                   Row(
                     children: [
                       Container(
-                        padding: EdgeInsets.all(2),
+                        padding: const EdgeInsets.all(2),
                         decoration: BoxDecoration(
                           color: Colors.blue[600],
                           borderRadius: BorderRadius.circular(2),
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.star,
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 15,
                       ),
                       Text(
                         "${(widget.tripsHistoryModel!.originAddress!).substring(0, 15)} ...",
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                         ),
@@ -191,7 +191,7 @@ class _HistoryDesignUiWidgetState extends State<HistoryDesignUiWidget> {
                   ),
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               Row(
@@ -200,22 +200,22 @@ class _HistoryDesignUiWidgetState extends State<HistoryDesignUiWidget> {
                   Row(
                     children: [
                       Container(
-                        padding: EdgeInsets.all(2),
+                        padding: const EdgeInsets.all(2),
                         decoration: BoxDecoration(
                           color: Colors.black,
                           borderRadius: BorderRadius.circular(2),
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.star,
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         width: 15,
                       ),
                       Text(
                         "${widget.tripsHistoryModel!.destinationAddress!}",
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
                         ),

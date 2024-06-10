@@ -38,16 +38,16 @@ class _TripsHistoryScreenState extends State<TripsHistoryScreen> {
         elevation: 0,
       ),
       body: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: ListView.separated(
           itemCount: Provider.of<AppInfo>(context, listen: false)
               .allTripsHistoryInformationList
               .length,
-          physics: ClampingScrollPhysics(),
+          physics: const ClampingScrollPhysics(),
           shrinkWrap: true,
           itemBuilder: (context, i) {
             return Card(
-              color: darkTheme?Colors.black:Colors.grey[100],
+              color: darkTheme ? Colors.black : Colors.grey[100],
               shadowColor: Colors.transparent,
               child: HistoryDesignUiWidget(
                 tripsHistoryModel: Provider.of<AppInfo>(context, listen: false)

@@ -109,7 +109,7 @@ class _RateRiderScreenState extends State<RateRiderScreen> {
               style: ElevatedButton.styleFrom(
                 foregroundColor:
                     darkTheme ? Colors.amber.shade400 : Colors.blue,
-                padding: EdgeInsets.symmetric(horizontal: 70),
+                padding: const EdgeInsets.symmetric(horizontal: 70),
               ),
               onPressed: () {
                 DatabaseReference rateRiderRef = FirebaseDatabase.instance
@@ -123,8 +123,10 @@ class _RateRiderScreenState extends State<RateRiderScreen> {
                     rateRiderRef.set(countRatingStars.toString());
 
                     Navigator.pop(context);
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (c) => SplashScreen()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (c) => const SplashScreen()));
                   } else {
                     double pastRatings =
                         double.parse(snap.snapshot.value.toString());
@@ -133,8 +135,10 @@ class _RateRiderScreenState extends State<RateRiderScreen> {
                     rateRiderRef.set(newAverageRatings.toString());
 
                     Navigator.pop(context);
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (c) => SplashScreen()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (c) => const SplashScreen()));
                   }
                   Fluttertoast.showToast(msg: "Restarting the app now");
                 });
